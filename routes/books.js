@@ -84,6 +84,71 @@ router.delete("/:isbn/review", auth, (req, res) => {
         reviews: book.reviews
     });
 });
+// GET BOOKS BY TITLE
+router.get("/title/:title", (req, res) => {
 
+    const result = books.filter(
+        b => b.title.toLowerCase() === req.params.title.toLowerCase()
+    );
+
+    if (result.length === 0) {
+        return res.json({ message: "No book found with this title" });
+    }
+
+    res.json(result);
+});
+// GET BOOK REVIEW
+router.get("/:isbn/review", (req, res) => {
+
+    const book = books.find(
+        b => b.isbn === req.params.isbn
+    );
+
+    if (!book) {
+        return res.json({ message: "Book not found" });
+    }
+
+    res.json({
+        isbn: book.isbn,
+        reviews: book.reviews
+    });
+});
+// TASK 10 - Get all books using async callback
+router.get("/async", (req, res) => {
+    setTimeout(() => {
+        res.json(books);
+    }, 1000);
+});
+// Search by ISBN using Promise
+router.get("/promise/isbn/:isbn", (req, res) => {
+
+    new Promise((resolve, reject) => {
+
+        const book = books.find(
+            b => b.isbn === req.params.isbn
+        );
+
+        if (book) {
+            resolve(book);
+        } else {
+            reject("Book not found");
+        }
+
+    })
+    .then(book => {
+        res.json(book);
+    })
+    .catch(err => {
+        res.json({ message: err });
+    });
+
+});
+router.get("/author/:author", (req, res) => {
+    const result = books.filter(
+        b => b.author.toLowerCase() === req.params.author.toLowerCase()
+    );
+
+    res.json(result);
+});
 
 module.exports = router;

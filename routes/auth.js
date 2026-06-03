@@ -1,29 +1,49 @@
 const express = require("express");
 const router = express.Router();
 
-const jwt = require("jsonwebtoken");
-const users = require("../users");
+const users = [];
 
-// LOGIN ROUTE
+// REGISTER
+router.post("/register", (req, res) => {
+    const { username, password } = req.body;
+
+    const existingUser = users.find(
+        u => u.username === username
+    );
+
+    if (existingUser) {
+        return res.json({
+            message: "User already exists"
+        });
+    }
+
+    users.push({
+        username,
+        password
+    });
+
+    res.json({
+        message: "User registered successfully"
+    });
+});
+
+// LOGIN
 router.post("/login", (req, res) => {
     const { username, password } = req.body;
 
     const user = users.find(
-        u => u.username === username && u.password === password
+        u => u.username === username &&
+             u.password === password
     );
 
     if (!user) {
-        return res.json({ message: "User not found" });
+        return res.status(401).json({
+            message: "Invalid credentials"
+        });
     }
 
-    const token = jwt.sign(
-        { username: user.username },
-        "mysecretkey"
-    );
-
     res.json({
-        message: "Login successful",
-        token
+        message: "Login successful"
     });
 });
 
